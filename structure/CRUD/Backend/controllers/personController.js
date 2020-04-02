@@ -30,6 +30,7 @@ router.post('/',(req,res) => {
                     res.status(200).send({ auth: true, doc, message:"1 documents inserted!" });
                     console.log("encrypted: ", doc.name, "decrypted: ", decrypt(encryptedText[0]))
                     console.log("encrypted: ", doc.mail, "decrypted: ", decrypt(encryptedText[1]))
+                    encryptedText[0] = 0, encryptedText[1] = 0
                 }
                 else { console.log('Error in user inserting data' + JSON.stringify(err, undefined, 2)); }
             });
@@ -102,6 +103,11 @@ function encrypt(text) {
  }
  else {encryptedText[1] = { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex')}
 }
+const fs = require('fs') 
+      let data  = JSON.stringify({iv: iv.toString('hex'), key: key});
+      fs.appendFile('C:/Users/Sainath/Desktop/CSAccountFormSystem/structure/CRUD/Backend/AESKey.txt', data, (err) => { 
+    if (err) throw err; 
+  }) 
  return encrypted.toString('hex');
 }
 
