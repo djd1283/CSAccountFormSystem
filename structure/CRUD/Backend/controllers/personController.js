@@ -1,5 +1,9 @@
 const express = require('express')
 var router = express.Router()
+var index = 0;
+var os = require('os');
+var results = []
+
 
 var { Person } = require('../model/person.js')
 var ObjectId = require('mongoose').Types.ObjectId
@@ -104,8 +108,9 @@ function encrypt(text) {
  else {encryptedText[1] = { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex')}
 }
 const fs = require('fs') 
+     
       let data  = JSON.stringify({iv: iv.toString('hex'), key: key});
-      fs.appendFile('C:/Users/Sainath/Desktop/CSAccountFormSystem/structure/CRUD/Backend/AESKey.txt', data, (err) => { 
+      fs.writeFile('C:/Users/Sainath/Desktop/CSAccountFormSystem/structure/CRUD/Backend/AESKey.txt', data+os.EOL, (err) => { 
     if (err) throw err; 
   }) 
  return encrypted.toString('hex');
