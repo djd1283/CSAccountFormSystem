@@ -11,25 +11,29 @@ router.get('/',(req,res) =>{
     })
 })
 
-
-
-
 router.post('/',(req,res) => {
     var per = new Person({
-        name : req.body.name,
+        first_name : req.body.first_name,
+        last_name : req.body.last_name,
         mail : req.body.mail,
-        class : req.body.class
+        major : req.body.major,
+        student_id : req.body.student_id,
+        completion_year : req.body.completion_year,
+        course_number : req.body.course_number,
+        prev_username : req.body.prev_username,
     });
     Person.findOne({'mail':req.body.mail}, (err, docs) => {
-        per.name = encrypt(per.name)
+        console.log('Name, email:', per.first_name, per.mail)
+        per.first_name = encrypt(per.first_name)
         per.mail = encrypt(per.mail)
         //per.class = encrypt(per.class.toString())
         if(!docs) {
             per.save((err, doc) => {
                 if(!err){                    
                     res.status(200).send({ auth: true, doc, message:"1 documents inserted!" });
-                    console.log("encrypted: ", doc.name, "decrypted: ", decrypt(encryptedText[0]))
-                    console.log("encrypted: ", doc.mail, "decrypted: ", decrypt(encryptedText[1]))
+                    console.log("encrypted: ", doc.first_name, "decrypted: ", decrypt(encryptedText[0]));
+                    console.log("encrypted: ", doc.mail, "decrypted: ", decrypt(encryptedText[1]));
+                    console.log("hello");
                 }
                 else { console.log('Error in user inserting data' + JSON.stringify(err, undefined, 2)); }
             });
@@ -43,14 +47,20 @@ router.post('/',(req,res) => {
     })
 })
 router.put('/:id',(req,res) => {
+    console.log('ID:', req.params.id)
     if(!ObjectId.isValid(req.params.id))
      return res.status(400).send('No record with given id: $(req.params.id)');
 
      var per = {
         $set: {
-            name : req.body.name,
+            first_name : req.body.first_name,
+            last_name : req.body.last_name,
             mail : req.body.mail,
-            class : req.body.class
+            major : req.body.major,
+            student_id : req.body.student_id,
+            completion_year : req.body.completion_year,
+            course_number : req.body.course_number,
+            prev_username : req.body.prev_username,
         }
     };
     Person.findOneAndUpdate({mail: req.body.mail}, per, {new: true, useFindAndModify: false}, (err, doc) => {

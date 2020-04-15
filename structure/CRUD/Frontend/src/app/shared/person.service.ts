@@ -18,7 +18,7 @@ export class PersonService {
     return this.http.put(this.baseURL + `/${_id}`, person);
   }
   
-  postPerson(person : Person){
+  postPerson(person : Person) {
     return this.http.post(this.baseURL,person)
   }
 

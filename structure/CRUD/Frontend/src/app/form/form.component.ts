@@ -19,8 +19,14 @@ export class FormComponent implements OnInit {
   headline: any;
   _id: any;
   mail: any;
-  class: any;
-  name: any;
+  major: any;
+  first_name: any;
+  last_name: any;
+  student_id: any;
+  completion_year: any;
+  course_number: any;
+  prev_username: any;
+
   disableStatus: any;
   public data = [];  
   result: any;
@@ -35,11 +41,12 @@ export class FormComponent implements OnInit {
   public fieldNames: Array<any> = [];
   constructor(private personService : PersonService) { 
     this.disableStatus = false;
-    this.headline = 'Insert';  
+    this.headline = 'Computer Science Account Form';  
   }
   ngOnInit() {
     this.fieldNames = [];
-    this.fieldNames = ['_id','class','email', 'name'];
+    this.fieldNames = ['_id','major','email', 'first_name', 'last_name', 'student_id', 
+                       'completion_year', 'course_number', 'prev_username'];
     this.displayedColumns.push('edit');
     this.displayedColumns.push('delete');
     this.displayedColumns = this.displayedColumns.concat(this.fieldNames);  
@@ -49,9 +56,14 @@ export class FormComponent implements OnInit {
         this.result.forEach(data => {
             this.data.push({
               _id: data._id,
-              class: data.class,
-              email:data.mail,
-              name: data.name
+              major: data.major,
+              email: data.mail,
+              first_name: data.first_name,
+              last_name: data.last_name,
+              student_id: data.student_id,
+              completion_year: data.completion_year,
+              course_number: data.course_number,
+              prev_username: data.prev_username
             });
         })
         this.dataSource.data = await this.data;
@@ -67,7 +79,7 @@ export class FormComponent implements OnInit {
   }
   onSubmit(form : NgForm){
     var headlines = this.headline;
-    if(headlines=='Insert') {
+    if(headlines=='Computer Science Account Form') {
       this.personService.postPerson(form.value).subscribe((res) => {
         this.refreshPersonList();
       },
@@ -82,10 +94,16 @@ export class FormComponent implements OnInit {
       );
     } else {
       var userData = {
+
         "_id": this._id,
-        "class": this.class,
+        "major": this.major,
         "mail": this.mail,
-        "name":this.name
+        "first_name": this.first_name,
+        "last_name": this.last_name,
+        "student_id": this.student_id,
+        "completion_year": this.completion_year,
+        "course_number": this.course_number,
+        "prev_username": this.prev_username,
       };
       this.personService.updatePerson(this._id, userData).subscribe((res) => {
         console.log(res);
@@ -120,13 +138,23 @@ export class FormComponent implements OnInit {
   editView(element) {
     this._id = element._id;
     this.mail = element.email;
-    this.class = element.class;
-    this.name = element.name;
+    this.major = element.class;
+    this.first_name = element.first_name;
+    this.last_name = element.last_name;
+    this.student_id = element.student_id;
+    this.prev_username = element.prev_username;
+    this.completion_year = element.completion_year;
+    this.course_number = element.course_number;
    
     // $("label[for='name']").toggleClass('active');
     // $("label[for='email']").toggleClass('active');
     $("label[for='email']").css('display', 'none');
-    $("label[for='name']").css('display', 'none');
+    $("label[for='first_name']").css('display', 'none');
+    $("label[for='last_name']").css('display', 'none');
+    $("label[for='student_id']").css('display', 'none');
+    $("label[for='prev_username']").css('display', 'none');
+    $("label[for='completion_year']").css('display', 'none');
+    $("label[for='course_number']").css('display', 'none');
     this.headline = 'Update';  
     this.disableStatus = true;
 

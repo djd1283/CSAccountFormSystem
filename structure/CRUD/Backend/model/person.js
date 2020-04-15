@@ -6,9 +6,14 @@ const mongoose = require('mongoose');
 
 var Schema = mongoose.Schema;
 var mySchema = new Schema({
-    name:{type : String},
+    first_name:{type : String},
+    last_name:{type: String},
     mail:{type : String},
-    class:{type : Number}
+    major:{type : String},
+    student_id:{type: String},
+    completion_year:{type: String},
+    course_number:{type: String},
+    prev_username:{type: String},
 });
  
 var Person = mongoose.model('Person', mySchema);

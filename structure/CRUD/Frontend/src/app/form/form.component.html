@@ -1,39 +1,75 @@
 <div class="main">
     <form name="form" action="" #personForm="ngForm" (ngSubmit)="onSubmit(personForm)">
-       <h1>Test Jenkings</h1>
-       <h3 style="margin-left:45%">{{headline}}</h3> 
+       <h1 style="text-align: center;">Computer Science Account Form</h1>
+       <!-- <h3 style="margin-left:45%">{{headline}}</h3> -->
        <div class="container">
         <!-- <input name="_id" type="hidden" #_id="ngModel" [(ngModel)]="personService.selectedPerson._id"> -->
         <input name="_id" type="hidden" [(ngModel)]="_id"> 
           <div class="input-field col s12">
             <!-- <input id="name" name="name" #name="ngModel" [(ngModel)]="personService.selectedPerson.name" type="text" class="validate"> -->
-            <input id="name" name="name" [(ngModel)]="name" type="text" class="validate">
-            <label for="name">Name</label>
+            <input id="first_name" name="first_name" [(ngModel)]="first_name" type="text" class="validate">
+            <label for="first_name">First Name</label>
+          </div>
+          <div class="input-field col s12">
+            <!-- <input id="name" name="name" #name="ngModel" [(ngModel)]="personService.selectedPerson.name" type="text" class="validate"> -->
+            <input id="last_name" name="last_name" [(ngModel)]="last_name" type="text" class="validate">
+            <label for="last_name">Last Name</label>
+          </div>
+          <div class="input-field col s12">
+            <!-- <input id="name" name="name" #name="ngModel" [(ngModel)]="personService.selectedPerson.name" type="text" class="validate"> -->
+            <input id="student_id" name="student_id" [(ngModel)]="student_id" type="text" class="validate">
+            <label for="student_id">Student ID</label>
           </div>
           <div class="input-field col s12">
             <!-- <input id="email" name="mail" #name="ngModel" [(ngModel)]="personService.selectedPerson.mail" type="email" class="validate"> -->
             <input id="email" name="mail" [(ngModel)]="this.mail" type="email" class="validate" [disabled]="disableStatus">
             <label for="email">Email</label>
-            <span class="helper-text" data-error="Invalid Mail" data-success="Email-Id is valid">Enter Valid Mail</span>
+            <span class="helper-text" data-error="Invalid Mail" data-success="Email-Id is valid">Enter valid mail</span>
           </div>
-          <mat-form-field>
-              <!-- <mat-select name="class" #name="ngModel" [(ngModel)]="personService.selectedPerson.class" placeholder="Class"> -->
+
+          <div>
+            <p>If you are renewing an account, specify previous username:</p>
+          </div> 
+
+          <div class="input-field col s12">
+            <!-- <input id="name" name="name" #name="ngModel" [(ngModel)]="personService.selectedPerson.name" type="text" class="validate"> -->
+            <input id="prev_username" name="prev_username" [(ngModel)]="prev_username" type="text" class="validate">
+            <label for="prev_username">Previous Username (if for account renewal)</label>
+          </div>
+            <!-- <mat-form-field>
               <mat-select name="class" [(ngModel)]="this.class" placeholder="Class">
-                <mat-option *ngFor="let item of arrayOne(10); let i = index;" [value]="i+1">{{i+1}}</mat-option> 
-                <!-- <mat-option value="1">1</mat-option>
-                <mat-option value="2">2</mat-option>
-                <mat-option value="3">3</mat-option>
-                <mat-option value="4">4</mat-option>
-                <mat-option value="5">5</mat-option>
-                <mat-option value="6">6</mat-option>
-                <mat-option value="7">7</mat-option>
-                <mat-option value="8">8</mat-option>
-                <mat-option value="9">9</mat-option>
-                <mat-option value="10">10</mat-option>
-                <mat-option value="11">11</mat-option>
-                <mat-option value="12">12</mat-option> -->
+                <mat-option *ngFor="let item of arrayOne(10); let i = index;" [value]="i+1">{{i+1}}</mat-option>
+              </mat-select>
+            </mat-form-field>  -->
+
+            <mat-form-field>
+              <!-- <mat-select name="class" #name="ngModel" [(ngModel)]="personService.selectedPerson.class" placeholder="Class"> -->
+              <mat-select name="major" [(ngModel)]="this.major" placeholder="Major">
+                <!-- <mat-option *ngFor="let item of arrayOne(10); let i = index;" [value]="i+1">{{i+1}}</mat-option> -->
+                <mat-option value="CS Doctorate">CS Doctorate</mat-option>
+                <mat-option value="CS Graduate">CS Graduate</mat-option>
+                <mat-option value="CS Undergraduate">CS Undergraduate</mat-option>
+                <mat-option value="Non-CS Major taking CS course">Non-CS Major</mat-option>
               </mat-select>
             </mat-form-field> 
+
+            <div class="input-field col s12">
+              <!-- <input id="name" name="name" #name="ngModel" [(ngModel)]="personService.selectedPerson.name" type="text" class="validate"> -->
+              <input id="completion_year" name="completion_year" [(ngModel)]="completion_year" type="text" class="validate">
+              <label for="completion_year">Completion Year</label>
+            </div>
+
+            
+          <div>
+            <p>If you are a non-CS major taking a CS course, please provide course number:</p>
+          </div>
+
+            <div class="input-field col s12">
+              <!-- <input id="name" name="name" #name="ngModel" [(ngModel)]="personService.selectedPerson.name" type="text" class="validate"> -->
+              <input id="course_number" name="course_number" [(ngModel)]="course_number" type="text" class="validate">
+              <label for="course_number">Course Number</label>
+            </div>
+
             <button class="btn waves-effect waves-light" type="submit" name="action">Submit
               <i class="material-icons right">send</i>
             </button>     
