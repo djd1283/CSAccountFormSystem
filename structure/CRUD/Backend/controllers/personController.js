@@ -121,7 +121,7 @@ function encrypt(text) {
 const fs = require('fs') 
      
       let data  = JSON.stringify({iv: iv.toString('hex'), key: key});
-      fs.writeFile('C:/Users/Sainath/Desktop/CSAccountFormSystem/structure/CRUD/Backend/AESKey.txt', data+os.EOL, (err) => { 
+      fs.writeFile('AESKey.txt', data+os.EOL, (err) => { 
     if (err) throw err; 
   }) 
  return encrypted.toString('hex');
