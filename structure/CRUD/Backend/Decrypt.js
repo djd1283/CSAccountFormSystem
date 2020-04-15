@@ -14,7 +14,7 @@ mongoose.connect('mongodb://localhost:27017/firstdb', { useNewUrlParser: true, u
 
       let data = JSON.stringify(result);
       var dataObj = JSON.parse(data);
-      // console.log(dataObj[0].name);
+      // console.log(dataObj);
 
       decryption(dataObj);
 
