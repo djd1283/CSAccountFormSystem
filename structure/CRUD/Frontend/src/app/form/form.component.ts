@@ -3,6 +3,8 @@ import { FormControl, Validators, NgForm } from '@angular/forms';
 import {MatPaginator, MatTableDataSource} from '@angular/material';
 import { PersonService } from '../shared/person.service'
 import { Person } from '../shared/person.model'
+
+import * as crypto from 'crypto';
 import * as $ from 'jquery';
 // import { Router } from '@angular/router';
 
