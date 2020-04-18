@@ -145,24 +145,28 @@ function decrypt(text) {
 
 ///  RSA Trial Publish Public KEY
 
-const publicKey = fs.readFileSync("./public_key", "utf8");
+var forge = require('node-forge');
+var rsa = forge.pki.rsa;
+var keypair = rsa.generateKeyPair({bits: 2048, e: 0x10001});
+fs.writeFileSync("public_key.txt", keypair.publicKey, "utf8");
+fs.writeFileSync("private_key.txt", keypair.privateKey, "utf8");
+// console.log(keypair.publicKey);
+// var bytes = "DavidisSmart"
+//var encrypted = keypair.publicKey.encrypt(bytes);
+//console.log("Encrypted", encrypted);
 
-const privateKey = fs.readFileSync("./private_key", "utf8");
-// console.log(privateKey)
+//var decrypted = keypair.privateKey.decrypt(encrypted);
+//console.log("Decrypted", decrypted);
 
-// const plaintext = Buffer.from('Hello world!', 'utf8');
+//const publicKey = fs.readFileSync("./public_key", "utf8");
 
-// This is what you usually do to transmit encrypted data.
-// const enc1 = crypto.publicEncrypt(publicKey, plaintext);
-// console.log("Encrypted ", enc1.toString('base64'))
-// const dec1 = crypto.privateDecrypt(privateKey, enc1);
-// console.log(dec1.toString('utf8'));
+// const privateKey = fs.readFileSync("./private_key", "utf8");
 
 var http = require('http');
 http.createServer(function (req, res) {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     //  res.write(req.url);
-    res.write(publicKey);
+    res.write(JSON.stringify(keypair.publicKey));
     res.end();
 }).listen(8080);
 
