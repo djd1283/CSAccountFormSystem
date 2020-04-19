@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, Validators, NgForm } from '@angular/forms';
 import {MatPaginator, MatTableDataSource} from '@angular/material';
-import { PersonService } from '../shared/person.service'
-import { Person } from '../shared/person.model'
+import { PersonService } from '../shared/person.service';
+import { Person } from '../shared/person.model';
 
-import * as crypto from 'crypto';
+import * as forge from 'node-forge';
+// import * as CryptoJS from 'crypto-js';
 import * as $ from 'jquery';
-// import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-form',
@@ -45,6 +45,7 @@ export class FormComponent implements OnInit {
     this.disableStatus = false;
     this.headline = 'Computer Science Account Form';  
   }
+
   ngOnInit() {
     this.fieldNames = [];
     this.fieldNames = ['_id','major','email', 'first_name', 'last_name', 'student_id', 
@@ -52,6 +53,7 @@ export class FormComponent implements OnInit {
     this.displayedColumns.push('edit');
     this.displayedColumns.push('delete');
     this.displayedColumns = this.displayedColumns.concat(this.fieldNames);  
+
 
     this.personService.getPersonList().subscribe(async(data) => {
         this.result = await data;
@@ -78,8 +80,65 @@ export class FormComponent implements OnInit {
       }
     );
     this.refreshPersonList();
+
+    // here we try out encryption code
+    // we grab public key from the server
+    // const public_key = '0123445679abcdef0123456789abcdef'
+    // we generate secret key
+    
+    // we send secret key to the server
+    // we encrypt using secret key
+    
+    // var pkstr = '-----BEGIN PUBLIC KEY-----' + public_key + '-----END PUBLIC KEY-----';
+    // const pk = forge.pki.publicKeyFromPem(pkstr);
+    // const encrypted_secret = forge.util.encode64(pk.encrypt(forge.util.hexToBytes(secret_key)));
+
+    //  var pkstr = '-----BEGIN PUBLIC KEY-----' + public_key + '-----END PUBLIC KEY-----';
+    // const pk = forge.pki.publicKeyFromPem(pkstr);
+
+    //const secret_key = '0123445679abcdef0123456789abcdef';
+    var secret_key = forge.random.getBytesSync(256);
+
+    var key_pair = this.personService.getPublicKey()
+
+    var ct = key_pair.publicKey.encrypt(secret_key);
+    var result = key_pair.privateKey.decrypt(ct);
+    console.log(result);
+
+    // var forge = require("node-forge");
+    // // generate a random key and IV
+    // // Note: a key size of 16 bytes will use AES-128, 24 => AES-192, 32 => AES-256
+    // var key = forge.random.getBytesSync(16);
+    // var iv = forge.random.getBytesSync(16);
+    
+    // /* alternatively, generate a password-based 16-byte key
+    // var salt = forge.random.getBytesSync(128);
+    // var key = forge.pkcs5.pbkdf2('password', salt, numIterations, 16);
+    // */
+    // var someBytes = "DavidSaiAjith"
+    // // encrypt some bytes using CBC mode
+    // // (other modes include: ECB, CFB, OFB, CTR, and GCM)
+    // // Note: CBC and ECB modes use PKCS#7 padding as default
+    // var cipher = forge.cipher.createCipher('AES-CBC', key);
+    // cipher.start({iv: iv});
+    // cipher.update(forge.util.createBuffer(someBytes));
+    // cipher.finish();
+    // var encrypted = cipher.output;
+    // // outputs encrypted hex
+    // console.log(encrypted.data);
+    
+    // // decrypt some bytes using CBC mode
+    // // (other modes include: CFB, OFB, CTR, and GCM)
+    // var decipher = forge.cipher.createDecipher('AES-CBC', key);
+    // decipher.start({iv: iv});
+    // decipher.update(encrypted);
+    // var result = decipher.finish(); // check 'result' for true/false
+    // // outputs decrypted hex
+    // console.log(decipher.output.data);
+
   }
   onSubmit(form : NgForm){
+
     var headlines = this.headline;
     if(headlines=='Computer Science Account Form') {
       this.personService.postPerson(form.value).subscribe((res) => {
@@ -95,6 +154,7 @@ export class FormComponent implements OnInit {
         }
       );
     } else {
+
       var userData = {
 
         "_id": this._id,
@@ -112,7 +172,7 @@ export class FormComponent implements OnInit {
         this.refreshPersonList();
       });
     } 
-    window.location.reload();
+    // window.location.reload();
   }
   isSticky(column: string) {
     return this.stickyColumns.find(val => val === column) !== undefined
