@@ -97,44 +97,45 @@ export class FormComponent implements OnInit {
     // const pk = forge.pki.publicKeyFromPem(pkstr);
 
     //const secret_key = '0123445679abcdef0123456789abcdef';
-    var secret_key = forge.random.getBytesSync(256);
+    var secret_key = forge.random.getBytesSync(16);
+    console.log(secret_key);
 
     var key_pair = this.personService.getPublicKey()
 
     var ct = key_pair.publicKey.encrypt(secret_key);
+
     var result = key_pair.privateKey.decrypt(ct);
     console.log(result);
 
     // var forge = require("node-forge");
-    // // generate a random key and IV
-    // // Note: a key size of 16 bytes will use AES-128, 24 => AES-192, 32 => AES-256
-    // var key = forge.random.getBytesSync(16);
-    // var iv = forge.random.getBytesSync(16);
+    // generate a random key and IV
+    // Note: a key size of 16 bytes will use AES-128, 24 => AES-192, 32 => AES-256
+    var iv = forge.random.getBytesSync(16);
     
-    // /* alternatively, generate a password-based 16-byte key
-    // var salt = forge.random.getBytesSync(128);
-    // var key = forge.pkcs5.pbkdf2('password', salt, numIterations, 16);
-    // */
-    // var someBytes = "DavidSaiAjith"
-    // // encrypt some bytes using CBC mode
-    // // (other modes include: ECB, CFB, OFB, CTR, and GCM)
-    // // Note: CBC and ECB modes use PKCS#7 padding as default
-    // var cipher = forge.cipher.createCipher('AES-CBC', key);
-    // cipher.start({iv: iv});
-    // cipher.update(forge.util.createBuffer(someBytes));
-    // cipher.finish();
-    // var encrypted = cipher.output;
-    // // outputs encrypted hex
-    // console.log(encrypted.data);
+    /* alternatively, generate a password-based 16-byte key
+    var salt = forge.random.getBytesSync(128);
+    var key = forge.pkcs5.pbkdf2('password', salt, numIterations, 16);
+    */
+    var someBytes = "DavidSaiAjith";
+    // encrypt some bytes using CBC mode
+    // (other modes include: ECB, CFB, OFB, CTR, and GCM)
+    // Note: CBC and ECB modes use PKCS#7 padding as default
+    var cipher = forge.cipher.createCipher('AES-CBC', secret_key);
+    cipher.start({iv: iv});
+    cipher.update(forge.util.createBuffer(someBytes));
+    cipher.finish();
+    var encrypted = cipher.output;
+    // outputs encrypted hex
+    console.log(encrypted.data);
     
-    // // decrypt some bytes using CBC mode
-    // // (other modes include: CFB, OFB, CTR, and GCM)
-    // var decipher = forge.cipher.createDecipher('AES-CBC', key);
-    // decipher.start({iv: iv});
-    // decipher.update(encrypted);
-    // var result = decipher.finish(); // check 'result' for true/false
-    // // outputs decrypted hex
-    // console.log(decipher.output.data);
+    // decrypt some bytes using CBC mode
+    // (other modes include: CFB, OFB, CTR, and GCM)
+    var decipher = forge.cipher.createDecipher('AES-CBC', secret_key);
+    decipher.start({iv: iv});
+    decipher.update(encrypted);
+    var finished = decipher.finish(); // check 'result' for true/false
+    // outputs decrypted hex
+    console.log(decipher.output.data);
 
   }
   onSubmit(form : NgForm){

@@ -11,6 +11,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import {MatTableModule} from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material';
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -28,8 +30,8 @@ import { MatPaginatorModule } from '@angular/material';
     FormsModule,
     MatTableModule,
     MatPaginatorModule,
-    ReactiveFormsModule
-  ],
+    ReactiveFormsModule,
+    ],
   exports: [
     BrowserModule,
     BrowserAnimationsModule,
