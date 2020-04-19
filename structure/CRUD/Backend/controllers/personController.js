@@ -29,34 +29,44 @@ router.post('/',(req,res) => {
     });
     Person.findOne({'mail':req.body.mail}, (err, docs) => {
         console.log('Name, email:', per.first_name, per.mail)
-        per.first_name = encrypt(per.first_name)
-        per.last_name = encrypt(per.last_name);
-        per.mail = encrypt(per.mail)
-        per.major = encrypt(per.major)
-        per.student_id = encrypt(per.student_id.toString('utf8'))
-        per.completion_year = encrypt(per.completion_year.toString('utf8'))
-        per.course_number = encrypt(per.course_number.toString('utf8'))
-        per.prev_username = encrypt(per.prev_username)
-        //per.class = encrypt(per.class.toString())
+
+        if (per.first_name != null) {per.first_name = encrypt(per.first_name);}
+        if (per.last_name != null) {per.last_name = encrypt(per.last_name);}
+        if (per.mail != null) {per.mail = encrypt(per.mail);}
+        if (per.major != null) {per.major = encrypt(per.major);}
+        if (per.student_id != null) {per.student_id = encrypt(per.student_id.toString('utf8'));}
+        if (per.completion_year != null) {per.completion_year = encrypt(per.completion_year.toString('utf8'));}
+        if (per.course_number != null) {per.course_number = encrypt(per.course_number.toString('utf8'));}
+        if (per.prev_username != null) {per.prev_username = encrypt(per.prev_username);}
+        //per.class = encrypt(per.class.toString());
+    
         if (!docs) {
             per.save((err, doc) => {
                 if(!err){                    
                     res.status(200).send({ auth: true, doc, message:"1 documents inserted!" });
-                    console.log("encrypted: ", doc.first_name, "decrypted: ", decrypt(encryptedText[0]));
-                    // console.log("encrypted: ", doc.last_name, "decrypted: ", decrypt(per.last_name));
-                    console.log("encrypted: ", doc.mail, "decrypted: ", decrypt(encryptedText[1]))
-                    encryptedText[0] = 0, encryptedText[1] = 0
+                    if (per.first_name != null && per.last_name != null && per.mail != null) {
+                        console.log("encrypted: ", doc.first_name, "decrypted: ", decrypt(encryptedText[0]));
+                        // console.log("encrypted: ", doc.last_name, "decrypted: ", decrypt(per.last_name));
+                        console.log("encrypted: ", doc.mail, "decrypted: ", decrypt(encryptedText[1]))
+                        encryptedText[0] = 0, encryptedText[1] = 0
+                    }
+                    else {
+                        console.log('Certain field values not available for encryption');
+                    }
                 }
-                else { console.log('Error in user inserting data' + JSON.stringify(err, undefined, 2)); }
+                else {
+                    console.log("User data already exists:" + req.body.mail);
+                    res.status(400).send({
+                        message: 'User data already exists:' + req.body.mail
+                    })
+                }            
             });
         }
-        else {
-            console.log("User data already exists:" + req.body.mail);
-            res.status(400).send({
-                message: 'User data already exists:' + req.body.mail
-            })
+        else { 
+            console.log('Error in user inserting data' + JSON.stringify(err, undefined, 2)); 
         }
-    })
+
+    });
 })
 router.put('/:id',(req,res) => {
     console.log('ID:', req.params.id)
