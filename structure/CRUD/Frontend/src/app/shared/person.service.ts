@@ -30,10 +30,7 @@ export class PersonService {
   }
 
   getPublicKey() {
-    var rsa = forge.pki.rsa;
-    var keypair = rsa.generateKeyPair({bits: 2048, e: 0x10001});
-    //return this.http.get(this.keyURL)
-    return keypair;
+    return this.http.get(this.keyURL);
   }
   
   deletePerson(_id:string){

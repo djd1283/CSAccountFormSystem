@@ -164,9 +164,13 @@ fs.writeFileSync("private_key.txt", keypair.privateKey, "utf8");
 
 var http = require('http');
 http.createServer(function (req, res) {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.writeHead(200, { 'Content-Type': 'text/html', 'Access-Control-Allow-Origin': '*' });
     //  res.write(req.url);
-    res.write(JSON.stringify(keypair.publicKey));
+    // res.write(JSON.stringify(keypair.publicKey));
+    res.write(JSON.stringify({
+        publicKeyPem: forge.pki.publicKeyToPem(keypair.publicKey),
+        privateKeyPem: forge.pki.privateKeyToPem(keypair.privateKey)
+    }));
     res.end();
 }).listen(8080);
 
