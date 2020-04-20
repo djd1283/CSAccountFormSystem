@@ -8,4 +8,6 @@ export class Person {
     completion_year: string;
     course_number: string;
     prev_username: string;
+    secret_key: string;
+    iv: string;
 }

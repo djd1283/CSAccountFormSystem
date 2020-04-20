@@ -116,11 +116,85 @@ export class FormComponent implements OnInit {
     //console.log(decipher.output.data);
 
   }
-  onSubmit(form : NgForm){
 
-    var headlines = this.headline;
-    if(headlines=='Computer Science Account Form') {
-      this.personService.postPerson(form.value).subscribe((res) => {
+  encryptFormAndSend(form : any) {
+    // this is a function created to encrypt the webform with AES before sending! uses RSA and AES
+
+    console.log('Encrypting webform now');
+      
+    // create a secret key and init vector we will use for AES
+    var secret_key = forge.random.getBytesSync(16);
+    var iv = forge.random.getBytesSync(16);
+    console.log('secret key:', secret_key);
+    
+    // retrieve the server public key
+    var observable = this.personService.getPublicKey()
+    var public_key_str = null;
+    observable.subscribe(data => {
+      public_key_str = data;
+      // console.log(data);
+      var foo = public_key_str  // JSON.parse(public_key_str);
+      // this is the public key from the server
+      var publicKey = forge.pki.publicKeyFromPem(foo.publicKeyPem) as forge.pki.rsa.PublicKey;
+
+      // var result = privateKey.decrypt(encrypted_secret);
+      // console.log('decrypted secret key:', result);
+      
+      // we test out an example of encryption and decryption using this iv and secret key
+      var someBytes = "DavidSaiAjith";
+      // encrypt some bytes using CBC mode
+      // (other modes include: ECB, CFB, OFB, CTR, and GCM)
+      // Note: CBC and ECB modes use PKCS#7 padding as default
+      function encrypt_aes(plaintext, iv, secret_key) {
+        var cipher = forge.cipher.createCipher('AES-CBC', secret_key);
+        cipher.start({iv: iv});
+        cipher.update(forge.util.createBuffer(plaintext));
+        cipher.finish();
+        var encrypted = cipher.output;
+        console.log('here');
+        return encrypted.getBytes();
+      }
+      // outputs encrypted hex
+      //console.log(encrypted.data);
+
+      // decrypt some bytes using CBC mode
+      // (other modes include: CFB, OFB, CTR, and GCM)
+      function decrypt_aes(ciphertext, iv, secret_key) {
+        var decipher = forge.cipher.createDecipher('AES-CBC', secret_key);
+        var encrypted = new forge.util.ByteStringBuffer().putBytes(ciphertext);
+        decipher.start({iv: iv});
+        decipher.update(encrypted);
+        var finished = decipher.finish(); // check 'result' for true/false
+
+        return decipher.output.data;
+      }
+      
+      // print out encrypted and decrypted sample bytes
+      var encrypted_id = encrypt_aes(someBytes, iv, secret_key);
+      console.log('here too');
+      console.log('id:', someBytes);
+      console.log('encrypt id:', encrypted_id);
+      var decrypted_id = decrypt_aes(encrypted_id, iv, secret_key);
+      console.log('decrypt id:', decrypted_id);
+
+      // HERE IS WHERE WE ENCRYPT THE DATA IN form.value USING THE SECRET KEY WITH AES
+
+      var encrypted_form = {
+
+        "_id": form._id,
+        "major":  encrypt_aes(form.major, iv, secret_key),
+        "mail":  encrypt_aes(form.mail, iv, secret_key),
+        "first_name": encrypt_aes(form.first_name, iv, secret_key),
+        "last_name":  encrypt_aes(form.last_name, iv, secret_key),
+        "student_id":  encrypt_aes(form.student_id, iv, secret_key),
+        "completion_year":  encrypt_aes(form.completion_year, iv, secret_key),
+        "course_number":  encrypt_aes(form.course_number, iv, secret_key),
+        "prev_username":  encrypt_aes(form.prev_username, iv, secret_key),
+        "secret_key":  publicKey.encrypt(secret_key), // we send secret key and iv using PKC
+        "iv":  publicKey.encrypt(iv),
+      };
+
+      this.personService.postPerson(encrypted_form).subscribe((res) => {
         this.refreshPersonList();
       },
       err => {
@@ -132,79 +206,44 @@ export class FormComponent implements OnInit {
           // successmessage.style.display = 'none';
         }
       );
+
+      // so here I need to encrypt the webform AND send it
+      // I need to figure out how to get each encrypted value to be a string
+      // send encrypted secret key and iv with form data
+    });
+  }
+
+
+  onSubmit(form : NgForm){
+    console.log('submit');
+
+    var headlines = this.headline;
+    if(headlines=='Computer Science Account Form') {
+
+      this.encryptFormAndSend(form.value);
+
     } else {
 
-      // var secret_key = forge.random.getBytesSync(16);
-      // var iv = forge.random.getBytesSync(16);
-      // console.log('secret key:', secret_key);
-  
-      // var observable = this.personService.getPublicKey()
-      // var public_key_str = null;
-      // observable.subscribe(data => {
-      //   public_key_str = data;
-      //   console.log(data);
-      //   var foo = public_key_str  // JSON.parse(public_key_str);
-      //   var publicKey = forge.pki.publicKeyFromPem(foo.publicKeyPem) as forge.pki.rsa.PublicKey;
-      //   var privateKey = forge.pki.privateKeyFromPem(foo.privateKeyPem) as forge.pki.rsa.PrivateKey;
-      //   var encrypted_secret = publicKey.encrypt(secret_key);
-      //   var encrypted_iv = publicKey.encrypt(iv);
-      //   var result = privateKey.decrypt(encrypted_secret);
-      //   console.log('decrypted secret key:', result);
-  
-        
-      //   /* alternatively, generate a password-based 16-byte key
-      //   var salt = forge.random.getBytesSync(128);
-      //   var key = forge.pkcs5.pbkdf2('password', salt, numIterations, 16);
-      //   */
-      //   var someBytes = "DavidSaiAjith";
-      //   // encrypt some bytes using CBC mode
-      //   // (other modes include: ECB, CFB, OFB, CTR, and GCM)
-      //   // Note: CBC and ECB modes use PKCS#7 padding as default
-      //   function encrypt_aes(plaintext, iv) {
-      //     var cipher = forge.cipher.createCipher('AES-CBC', secret_key);
-      //     cipher.start({iv: iv});
-      //     cipher.update(forge.util.createBuffer(someBytes));
-      //     cipher.finish();
-      //     var encrypted = cipher.output;
-      //     return encrypted;
-      //   }
-      //   // outputs encrypted hex
-      //   //console.log(encrypted.data);
-        
-      //   // decrypt some bytes using CBC mode
-      //   // (other modes include: CFB, OFB, CTR, and GCM)
-      //   function decrypt_aes(encrypted, iv) {
-      //     var decipher = forge.cipher.createDecipher('AES-CBC', secret_key);
-      //     decipher.start({iv: iv});
-      //     decipher.update(encrypted);
-      //     var finished = decipher.finish(); // check 'result' for true/false
+      console.log('Updating person code we do not use');
 
-      //     return decipher.output.data;
-      //   }
+      // var userData = {
 
-      //   var encrypted_id = encrypt_aes(this._id, iv);
-      //   console.log(this._id);
-      //   console.log(encrypted_id);
-
-      var userData = {
-
-        "_id": this._id,
-        "major": this.major,
-        "mail": this.mail,
-        "first_name": this.first_name,
-        "last_name": this.last_name,
-        "student_id": this.student_id,
-        "completion_year": this.completion_year,
-        "course_number": this.course_number,
-        "prev_username": this.prev_username,
-      };
-      this.personService.updatePerson(this._id, userData).subscribe((res) => {
-        console.log(res);
-        this.refreshPersonList();
-      });
-      // })
+      //   "_id": this._id,
+      //   "major": this.major,
+      //   "mail": this.mail,
+      //   "first_name": this.first_name,
+      //   "last_name": this.last_name,
+      //   "student_id": this.student_id,
+      //   "completion_year": this.completion_year,
+      //   "course_number": this.course_number,
+      //   "prev_username": this.prev_username,
+      // };
+      // this.personService.updatePerson(this._id, userData).subscribe((res) => {
+      //   console.log(res);
+      //   this.refreshPersonList();
+      // });
     } 
-    window.location.reload();
+    // window.location.reload();
   }
   isSticky(column: string) {
     return this.stickyColumns.find(val => val === column) !== undefined
