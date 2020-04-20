@@ -4,6 +4,9 @@ var index = 0;
 var os = require('os');
 var results = []
 const fs = require('fs')
+var forge = require('node-forge');
+var rsa = forge.pki.rsa;
+var RSA_E_IV1, RSA_E_Key1
 
 
 var { Person } = require('../model/person.js')
@@ -17,37 +20,68 @@ router.get('/', (req, res) => {
 })
 
 router.post('/', (req, res) => {
+
+    // req.body.secret_key and req.body.iv should be decrypted with server private key
+    // then the secret key and iv should be used to decrypte all person data fields
+    // before re-encrypting and sending to the database
+    // this should use node-forge
+
+    // RSA Decryption of AES Key1 + AES_Decryption of data
+    RSA_E_IV1 = req.body.iv
+    RSA_E_Key1 = req.body.secret_key
+    var D_AES_Key1 = keypair.privateKey.decrypt(RSA_E_Key1);
+    var D_AES_IV1 = keypair.privateKey.decrypt(RSA_E_IV1);
+
     var per = new Person({
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
-        mail: req.body.mail,
-        major: req.body.major,
-        student_id: req.body.student_id,
-        completion_year: req.body.completion_year,
-        course_number: req.body.course_number,
-        prev_username: req.body.prev_username,
+        first_name: decrypt_aes(req.body.first_name, D_AES_IV1, D_AES_Key1),
+        last_name: decrypt_aes(req.body.last_name, D_AES_IV1, D_AES_Key1),
+        mail: decrypt_aes(req.body.mail, D_AES_IV1, D_AES_Key1),
+        major: decrypt_aes(req.body.major, D_AES_IV1, D_AES_Key1),
+        student_id: decrypt_aes(req.body.student_id, D_AES_IV1, D_AES_Key1),
+        completion_year: decrypt_aes(req.body.completion_year, D_AES_IV1, D_AES_Key1),
+        course_number: decrypt_aes(req.body.course_number, D_AES_IV1, D_AES_Key1),
+        prev_username: decrypt_aes(req.body.prev_username, D_AES_IV1, D_AES_Key1),
     });
+   
+
+    // by this point, per should be decrypted using private key and secret key AES
+
+
     Person.findOne({ 'mail': req.body.mail }, (err, docs) => {
-        //  console.log('Name, email:', per.first_name, per.mail)
-        per.first_name = encrypt(per.first_name)
-        per.last_name = encrypt(per.last_name);
-        per.mail = encrypt(per.mail)
-        per.major = encrypt(per.major)
-        per.student_id = encrypt(per.student_id.toString('utf8'))
-        per.completion_year = encrypt(per.completion_year.toString('utf8'))
-        per.course_number = encrypt(per.course_number.toString('utf8'))
-        per.prev_username = encrypt(per.prev_username)
-        //per.class = encrypt(per.class.toString())
+        // console.log('Name, email:', per.first_name, per.mail)
+
+        // reenable this to allow encryption between server and MongoDB
+
+        // encrypt all data fields as input to the database (with AES KEY 2)
+        if (per.first_name != null) {per.first_name = encrypt(per.first_name);}
+        if (per.last_name != null) {per.last_name = encrypt(per.last_name);}
+        if (per.mail != null) {per.mail = encrypt(per.mail);}
+        if (per.major != null) {per.major = encrypt(per.major);}
+        if (per.student_id != null) {per.student_id = encrypt(per.student_id.toString('utf8'));}
+        if (per.completion_year != null) {per.completion_year = encrypt(per.completion_year.toString('utf8'));}
+        if (per.course_number != null) {per.course_number = encrypt(per.course_number.toString('utf8'));}
+        if (per.prev_username != null) {per.prev_username = encrypt(per.prev_username);}
+        if (per.class != null) {per.class = encrypt(per.class.toString());}
+
         if (!docs) {
             per.save((err, doc) => {
                 if (!err) {
+                    // console.log('doc', doc);
+
                     res.status(200).send({ auth: true, doc, message: "1 documents inserted!" });
-                    console.log("encrypted: ", doc.first_name, "decrypted: ", decrypt(encryptedText[0]));
-                    // console.log("encrypted: ", doc.last_name, "decrypted: ", decrypt(per.last_name));
-                    console.log("encrypted: ", doc.mail, "decrypted: ", decrypt(encryptedText[1]))
-                    encryptedText[0] = 0, encryptedText[1] = 0
+                    // if (per.first_name != null && per.last_name != null && per.mail != null) {
+                    //     console.log("encrypted: ", doc.first_name, "decrypted: ", decrypt(encryptedText[0]));
+                    //     // console.log("encrypted: ", doc.last_name, "decrypted: ", decrypt(per.last_name));
+                    //     console.log("encrypted: ", doc.mail, "decrypted: ", decrypt(encryptedText[1]))
+                    //     encryptedText[0] = 0, encryptedText[1] = 0
+                    // }
+                    // else {
+                    //     console.log('Certain field values not available for encryption');
+                    // }
                 }
-                else { console.log('Error in user inserting data' + JSON.stringify(err, undefined, 2)); }
+                else {
+                    console.log('Error in user inserting data' + JSON.stringify(err, undefined, 2));
+                }
             });
         }
         else {
@@ -56,12 +90,18 @@ router.post('/', (req, res) => {
                 message: 'User data already exists:' + req.body.mail
             })
         }
-    })
+
+    });
 })
 router.put('/:id', (req, res) => {
     console.log('ID:', req.params.id)
     if (!ObjectId.isValid(req.params.id))
         return res.status(400).send('No record with given id: $(req.params.id)');
+
+    // I'm not sure what happens down here in put function, but may need to hand data too
+    // req.body.secret_key and req.body.iv should be decrypted with server private key
+    // then the secret key and iv should be used to decrypte all person data fields
+    // before re-encrypting and sending to the database
 
     var per = {
         $set: {
@@ -104,9 +144,9 @@ router.delete('/:id', (req, res) => {
 
 module.exports = router
 
-
 // My Trial
-// Nodejs encryption with CTR
+// Second AES encryption before Database AES KEY 2
+// Nodejs encryption with CTR 
 const crypto = require('crypto');
 const algorithm = 'aes-256-cbc';
 const key = crypto.randomBytes(32);
@@ -123,7 +163,7 @@ function encrypt(text) {
         encryptedText[0] = { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') }
     }
     else {
-    encryptedText[1] = { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') }
+        encryptedText[1] = { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') }
     }
     const fs = require('fs')
 
@@ -147,32 +187,37 @@ function decrypt(text) {
 
 var forge = require('node-forge');
 var rsa = forge.pki.rsa;
-var keypair = rsa.generateKeyPair({bits: 2048, e: 0x10001});
+var keypair = rsa.generateKeyPair({ bits: 2048, e: 0x10001 });
 fs.writeFileSync("public_key.txt", keypair.publicKey, "utf8");
 fs.writeFileSync("private_key.txt", keypair.privateKey, "utf8");
-// console.log(keypair.publicKey);
-// var bytes = "DavidisSmart"
-//var encrypted = keypair.publicKey.encrypt(bytes);
-//console.log("Encrypted", encrypted);
-
-//var decrypted = keypair.privateKey.decrypt(encrypted);
-//console.log("Decrypted", decrypted);
-
-//const publicKey = fs.readFileSync("./public_key", "utf8");
-
-// const privateKey = fs.readFileSync("./private_key", "utf8");
 
 var http = require('http');
 http.createServer(function (req, res) {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.writeHead(200, { 'Content-Type': 'text/html', 'Access-Control-Allow-Origin': '*' });
     //  res.write(req.url);
-    res.write(JSON.stringify(keypair.publicKey));
+    // res.write(JSON.stringify(keypair.publicKey));
+    res.write(JSON.stringify({
+        publicKeyPem: forge.pki.publicKeyToPem(keypair.publicKey),
+    }));
     res.end();
 }).listen(8080);
 
+// David's Decrypt for AES KEY 1 
+
+function decrypt_aes(ciphertext, iv, secret_key) {
+    var decipher = forge.cipher.createDecipher('AES-CBC', secret_key);
+    var encrypted = new forge.util.ByteStringBuffer().putBytes(ciphertext);
+    decipher.start({iv: iv});
+    decipher.update(encrypted);
+    var finished = decipher.finish(); // check 'result' for true/false
+
+    return decipher.output.data;
+  }
+
+  /*
 const axios = require('axios');
 
 axios.get('http://localhost:8080').then(resp => {
 
     console.log("GET working", resp.data);
-});
+}); */
