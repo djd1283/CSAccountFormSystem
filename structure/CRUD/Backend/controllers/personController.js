@@ -20,13 +20,18 @@ router.get('/', (req, res) => {
     })
 })
 
+<<<<<<< HEAD
 router.post('/', (req, res) => {
+=======
+router.post('/',(req,res) => {
+>>>>>>> d15c00f3b2ac68e916661eb8c7beea907cad1243
 
     // req.body.secret_key and req.body.iv should be decrypted with server private key
     // then the secret key and iv should be used to decrypte all person data fields
     // before re-encrypting and sending to the database
     // this should use node-forge
 
+<<<<<<< HEAD
     // RSA Decryption of AES Key1 + AES_Decryption of data
     RSA_E_IV1 = req.body.iv
     RSA_E_Key1 = req.body.secret_key
@@ -86,6 +91,44 @@ router.post('/', (req, res) => {
                     // console.log('doc', doc);
 
                     res.status(200).send({ auth: true, doc, message: "1 documents inserted!" });
+=======
+    var per = new Person({
+        first_name : req.body.first_name,
+        last_name : req.body.last_name,
+        mail : req.body.mail,
+        major : req.body.major,
+        student_id : req.body.student_id,
+        completion_year : req.body.completion_year,
+        course_number : req.body.course_number,
+        prev_username : req.body.prev_username,
+    });
+
+    // by this point, per should be decrypted using private key and secret key AES
+
+
+    Person.findOne({'mail':req.body.mail}, (err, docs) => {
+        console.log('Name, email:', per.first_name, per.mail)
+
+        // reenable this to allow encryption between server and MongoDB
+
+        // encrypt all data fields as input to the database
+        // if (per.first_name != null) {per.first_name = encrypt(per.first_name);}
+        // if (per.last_name != null) {per.last_name = encrypt(per.last_name);}
+        // if (per.mail != null) {per.mail = encrypt(per.mail);}
+        // if (per.major != null) {per.major = encrypt(per.major);}
+        // if (per.student_id != null) {per.student_id = encrypt(per.student_id.toString('utf8'));}
+        // if (per.completion_year != null) {per.completion_year = encrypt(per.completion_year.toString('utf8'));}
+        // if (per.course_number != null) {per.course_number = encrypt(per.course_number.toString('utf8'));}
+        // if (per.prev_username != null) {per.prev_username = encrypt(per.prev_username);}
+        //per.class = encrypt(per.class.toString());
+    
+        if (!docs) {
+            per.save((err, doc) => {
+                if(!err){                    
+                    console.log('doc', doc);
+
+                    res.status(200).send({ auth: true, doc, message:"1 documents inserted!" });
+>>>>>>> d15c00f3b2ac68e916661eb8c7beea907cad1243
                     // if (per.first_name != null && per.last_name != null && per.mail != null) {
                     //     console.log("encrypted: ", doc.first_name, "decrypted: ", decrypt(encryptedText[0]));
                     //     // console.log("encrypted: ", doc.last_name, "decrypted: ", decrypt(per.last_name));
@@ -95,10 +138,17 @@ router.post('/', (req, res) => {
                     // else {
                     //     console.log('Certain field values not available for encryption');
                     // }
+<<<<<<< HEAD
                 }
                 else {
                     console.log('Error in user inserting data' + JSON.stringify(err, undefined, 2));
                 }
+=======
+                }
+                else { 
+                    console.log('Error in user inserting data' + JSON.stringify(err, undefined, 2)); 
+                }     
+>>>>>>> d15c00f3b2ac68e916661eb8c7beea907cad1243
             });
         }
         else {
@@ -106,14 +156,23 @@ router.post('/', (req, res) => {
             res.status(400).send({
                 message: 'User data already exists:' + req.body.mail
             })
+<<<<<<< HEAD
         }
+=======
+        }       
+>>>>>>> d15c00f3b2ac68e916661eb8c7beea907cad1243
 
     });
 })
-router.put('/:id', (req, res) => {
+router.put('/:id',(req,res) => {
     console.log('ID:', req.params.id)
-    if (!ObjectId.isValid(req.params.id))
-        return res.status(400).send('No record with given id: $(req.params.id)');
+    if(!ObjectId.isValid(req.params.id))
+     return res.status(400).send('No record with given id: $(req.params.id)');
+
+    // I'm not sure what happens down here in put function, but may need to hand data too
+    // req.body.secret_key and req.body.iv should be decrypted with server private key
+    // then the secret key and iv should be used to decrypte all person data fields
+    // before re-encrypting and sending to the database
 
     // I'm not sure what happens down here in put function, but may need to hand data too
     // req.body.secret_key and req.body.iv should be decrypted with server private key
@@ -122,14 +181,14 @@ router.put('/:id', (req, res) => {
 
     var per = {
         $set: {
-            first_name: req.body.first_name,
-            last_name: req.body.last_name,
-            mail: req.body.mail,
-            major: req.body.major,
-            student_id: req.body.student_id,
-            completion_year: req.body.completion_year,
-            course_number: req.body.course_number,
-            prev_username: req.body.prev_username,
+            first_name : req.body.first_name,
+            last_name : req.body.last_name,
+            mail : req.body.mail,
+            major : req.body.major,
+            student_id : req.body.student_id,
+            completion_year : req.body.completion_year,
+            course_number : req.body.course_number,
+            prev_username : req.body.prev_username,
         }
     };
     Person.findOneAndUpdate({ mail: req.body.mail }, per, { new: true, useFindAndModify: false }, (err, doc) => {
