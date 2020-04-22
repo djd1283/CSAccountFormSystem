@@ -6,11 +6,14 @@ import { map } from 'rxjs/operators';
 import { Person } from './person.model';
 import { NgForm } from '@angular/forms';
 
+import * as forge from 'node-forge';
+
 @Injectable()
 export class PersonService {
   selectedPerson = Person;
   persons : Person[];
   readonly baseURL ="http://localhost:3000/person";
+  readonly keyURL = "http://localhost:8080/";
 
   constructor( private http : HttpClient) { }
 
@@ -18,12 +21,16 @@ export class PersonService {
     return this.http.put(this.baseURL + `/${_id}`, person);
   }
   
-  postPerson(person : Person){
+  postPerson(person : Person) {
     return this.http.post(this.baseURL,person)
   }
 
   getPersonList(){
     return this.http.get(this.baseURL);
+  }
+
+  getPublicKey() {
+    return this.http.get(this.keyURL);
   }
   
   deletePerson(_id:string){
