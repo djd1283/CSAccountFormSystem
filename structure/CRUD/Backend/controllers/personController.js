@@ -7,6 +7,7 @@ const fs = require('fs')
 var forge = require('node-forge');
 var rsa = forge.pki.rsa;
 var RSA_E_IV1, RSA_E_Key1
+var nodemailer = require('nodemailer');
 
 
 var { Person } = require('../model/person.js')
@@ -42,12 +43,28 @@ router.post('/', (req, res) => {
         course_number: decrypt_aes(req.body.course_number, D_AES_IV1, D_AES_Key1),
         prev_username: decrypt_aes(req.body.prev_username, D_AES_IV1, D_AES_Key1),
     });
+
+    // Ajith's Nodemailer
+    const mailOptions = {
+        from: `"Ajith", "ajithchowdary_attanti@student.uml.edu"`,
+        to: per.mail,
+          subject: "CS Account Registartion ",
+        html: "<h4>Hello " + per.first_name + ",</h4><p>Thanks for creating the CS account, the details of the user id and default password will be send to mail soon. If you are not the recipient of this, please contact help@cs.uml.edu </p>"
+      };
+      
+      transporter.sendMail(mailOptions, function(error, info){
+        if(error){
+            return console.log(error);
+        }
+      
+        console.log('Message sent: ' + info.response);
+      });
    
 
     // by this point, per should be decrypted using private key and secret key AES
 
 
-    Person.findOne({ 'mail': req.body.mail }, (err, docs) => {
+    Person.findOne({ 'mail': encrypt(per.mail) }, (err, docs) => {
         // console.log('Name, email:', per.first_name, per.mail)
 
         // reenable this to allow encryption between server and MongoDB
@@ -221,3 +238,48 @@ axios.get('http://localhost:8080').then(resp => {
 
     console.log("GET working", resp.data);
 }); */
+
+// Nodemailer Code - Ajith testing
+
+ //mail testing
+
+ // define a sendmail endpoint, which will send emails and response with the corresponding status
+ router.post("/sendmail", (req, res) => {
+    console.log("request came");
+    let user = req.body;
+    sendMail(user, (err, info) => {
+      if (err) {
+        console.log(err);
+        res.status(400);
+        res.send({ error: "Failed to send email" });
+      } else {
+        console.log("Email has been sent");
+        res.send(info);
+      }
+    });
+  }); 
+  
+  
+  
+    var transporter = nodemailer.createTransport({
+      host: "smtp-mail.outlook.com",
+      secureConnection: false,
+      port: 587,
+      tls: {
+        ciphers:'SSLv3'
+     },
+      auth: {
+        user: "ajithchowdary_attanti@student.uml.edu",
+        pass: "Uml@01825959"
+      },
+     // tls: {
+       // ciphers:'SSLv3'
+    //}
+    }); 
+  
+  
+  
+  //transporter.sendMail(mailOptions, callback);
+  
+  //`"ajithchowdary_attanti@student.uml.edu"`,  
+  
