@@ -28,7 +28,11 @@ export class FormComponent implements OnInit {
   completion_year: any;
   course_number: any;
   prev_username: any;
+  honeypot:any;
+  
+  
 
+	
   disableStatus: any;
   public data = [];  
   result: any;
@@ -67,7 +71,8 @@ export class FormComponent implements OnInit {
               student_id: data.student_id,
               completion_year: data.completion_year,
               course_number: data.course_number,
-              prev_username: data.prev_username
+              prev_username: data.prev_username,
+			
             });
         })
         this.dataSource.data = await this.data;
@@ -193,26 +198,28 @@ export class FormComponent implements OnInit {
         "secret_key":  publicKey.encrypt(secret_key), // we send secret key and iv using PKC
         "iv":  publicKey.encrypt(iv),
       };
-
-      this.personService.postPerson(encrypted_form).subscribe((res) => {
-        this.refreshPersonList();
-      },
-      err => {
-          console.log(err);
-          (<HTMLInputElement>document.getElementById("errmsg1")).innerHTML = err.error.message;
-          var value = (<HTMLInputElement>document.getElementById("errmsg1"));
-          value.style.display = 'block';
-          value.style.color = 'red';
-          // successmessage.style.display = 'none';
-        }
-      );
-
+		  if (form.honeypot != null) {
+        window.alert("Bot identified");
+      }
+	    else {
+        this.personService.postPerson(encrypted_form).subscribe((res) => {
+          this.refreshPersonList();
+        },
+        err => {
+            console.log(err);
+            (<HTMLInputElement>document.getElementById("errmsg1")).innerHTML = err.error.message;
+            var value = (<HTMLInputElement>document.getElementById("errmsg1"));
+            value.style.display = 'block';
+            value.style.color = 'red';
+            // successmessage.style.display = 'none';
+          }
+        );
+	    }
       // so here I need to encrypt the webform AND send it
       // I need to figure out how to get each encrypted value to be a string
       // send encrypted secret key and iv with form data
     });
   }
-
 
   onSubmit(form : NgForm){
     console.log('submit');

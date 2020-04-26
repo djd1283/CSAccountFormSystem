@@ -1,6 +1,22 @@
+<!DOCTYPE html>
 <html>
+<head>
+
+<style> input#middle_name { display: none;}	</style>
+
+<!-- <style> input#honeypot { display: none;}	</style> -->
+		
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+
+
+<script src="https://www.google.com/recaptcha/api.js"></script>
+		
+</head>
+
 <body>
-    
+	
+	
+	
   <div class="main">
     <img  align="left" src="https://upload.wikimedia.org/wikipedia/en/0/02/UMass-Lowell-logo.png" alt="image" style="width:150px;height:150px;">
 
@@ -14,32 +30,40 @@
         <input name="_id" type="hidden" [(ngModel)]="_id"> 
           <div class="input-field col s12">
             <!-- <input id="name" name="name" #name="ngModel" [(ngModel)]="personService.selectedPerson.name" type="text" class="validate"> -->
-            <input id="first_name" name="first_name" [(ngModel)]="first_name" type="text" class="validate">
-            <label for="first_name">First Name</label>
+            <input id="first_name" name="first_name" [(ngModel)]="first_name" type="text" class="validate" required>
+            <label for="first_name">First Name</label> 
           </div>
 
           <!--hidden field for honeypot -->
-          <div class="input-field col s12">
+		  
+		 
+		<!--  <button id="honeypot" onclick="myFunction()" style="display:none" name="click me">click</button>
+		  <p id="demo"></p>-->
+
+			<div>
             <!-- <input id="name" name="name" #name="ngModel" [(ngModel)]="personService.selectedPerson.name" type="text" class="validate"> -->
-            <input id="middle_name" name="middle_name"  type="hidden" class="validate" value="Field for honeypot sca
-            m">
+            <input id="middle_name" name="middle_name"  type="text" autocomplete="off">
             
-          </div>
-          <!-- Honeypot ends-->
+          </div> 
+
+		 
+		  
+		  
+           <!--Honeypot ends-->
 
           <div class="input-field col s12">
             <!-- <input id="name" name="name" #name="ngModel" [(ngModel)]="personService.selectedPerson.name" type="text" class="validate"> -->
-            <input id="last_name" name="last_name" [(ngModel)]="last_name" type="text" class="validate">
+            <input id="last_name" name="last_name" [(ngModel)]="last_name" type="text" class="validate" required>
             <label for="last_name">Last Name</label>
           </div>
           <div class="input-field col s12">
             <!-- <input id="name" name="name" #name="ngModel" [(ngModel)]="personService.selectedPerson.name" type="text" class="validate"> -->
-            <input id="student_id" name="student_id" [(ngModel)]="student_id" type="text" class="validate">
+            <input id="student_id" name="student_id" [(ngModel)]="student_id" type="text" class="validate" required>
             <label for="student_id">Student ID</label>
           </div>
           <div class="input-field col s12">
             <!-- <input id="email" name="mail" #name="ngModel" [(ngModel)]="personService.selectedPerson.mail" type="email" class="validate"> -->
-            <input id="email" name="mail" [(ngModel)]="this.mail" type="email" class="validate" [disabled]="disableStatus">
+            <input id="email" name="mail" [(ngModel)]="this.mail" type="email" class="validate" [disabled]="disableStatus" required>
             <label for="email">Email</label>
             <span class="helper-text" data-error="Invalid Mail" data-success="Email-Id is valid">Enter valid mail</span>
           </div>
@@ -50,7 +74,7 @@
 
           <div class="input-field col s12">
             <!-- <input id="name" name="name" #name="ngModel" [(ngModel)]="personService.selectedPerson.name" type="text" class="validate"> -->
-            <input id="prev_username" name="prev_username" [(ngModel)]="prev_username" type="text" class="validate">
+            <input id="prev_username" name="prev_username" [(ngModel)]="prev_username" type="text" class="validate" >
             <label for="prev_username">Previous Username</label>
           </div>
             <!-- <mat-form-field>
@@ -61,7 +85,7 @@
 
             <mat-form-field>
               <!-- <mat-select name="class" #name="ngModel" [(ngModel)]="personService.selectedPerson.class" placeholder="Class"> -->
-              <mat-select name="major" [(ngModel)]="this.major" placeholder="Major">
+              <mat-select name="major" [(ngModel)]="this.major" placeholder="Major" required>
                 <!-- <mat-option *ngFor="let item of arrayOne(10); let i = index;" [value]="i+1">{{i+1}}</mat-option> -->
                 <mat-option value="CS Doctorate">CS Doctorate</mat-option>
                 <mat-option value="CS Graduate">CS Graduate</mat-option>
@@ -72,7 +96,7 @@
 
             <div class="input-field col s12">
               <!-- <input id="name" name="name" #name="ngModel" [(ngModel)]="personService.selectedPerson.name" type="text" class="validate"> -->
-              <input id="completion_year" name="completion_year" [(ngModel)]="completion_year" type="text" class="validate">
+              <input id="completion_year" name="completion_year" [(ngModel)]="completion_year" type="text" class="validate" required>
               <label for="completion_year">Completion Year</label>
             </div>
 
@@ -86,14 +110,37 @@
               <input id="course_number" name="course_number" [(ngModel)]="course_number" type="text" class="validate">
               <label for="course_number">Course Number</label>
             </div>
+			
+			
+			 <div class="input-field col s12">
+            <!-- <input id="name" name="name" #name="ngModel" [(ngModel)]="personService.selectedPerson.name" type="text" class="validate"> -->
+            <input id="honeypot" name="honeypot" [(ngModel)]="honeypot" type="text" class="validate" >
+            <label for="honeypot">Honeypot</label> 
+          </div>
+			
+			
+			
+			<div class="g-recaptcha" data-sitekey="6Lcs0u0UAAAAAAszrurG9K37Bvr_vK3c8AMm84IM"> recpatcha</div> <br>
+			 
+			  <input class="btn waves-effect waves-light" type="reset" value="Reset">
 
-            <button class="btn waves-effect waves-light" type="submit" name="action">Submit
+            <button class="btn waves-effect waves-light" type="submit" name="action" [disabled]="personForm.invalid">Submit
               <i class="material-icons right">send</i>
-            </button>     
+            </button>  
+
+			
+			
             <small id="errmsg1" class="form-text" style="display: none;margin-top:5%"></small> 
           </div>
           
         </form>
+		
+		
+    
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+		
 
         <!-- Display data -->
         <!-- <div *ngFor="let per of personService.persons" style="text-align: center">
